@@ -1,2 +1,1 @@
-# BUS_Segmentation
- 
+# Curriculum KD
