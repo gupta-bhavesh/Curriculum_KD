@@ -35,7 +35,7 @@ class LinkNet(nn.Module):
   
         super(LinkNet, self).__init__()
 
-        base = models.resnet18(pretrained=True)
+        base = models.resnet18()
 
         self.in_block = nn.Sequential(
             base.conv1,

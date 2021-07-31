@@ -21,7 +21,7 @@ class LoadImageDataset(Dataset):
 
         self.filepaths = filepaths
         self.apply_transform = apply_transform
-        self.resize_inp = Resize((IMAGE_SIZE, IMAGE_SIZE), interpolation = InterpolationMode.BICUBIC)
+        self.resize_inp = Resize((IMAGE_SIZE, IMAGE_SIZE), interpolation = InterpolationMode.NEAREST)
         self.resize_mask = Resize((IMAGE_SIZE, IMAGE_SIZE), interpolation = InterpolationMode.NEAREST)
 
     def __len__(self):

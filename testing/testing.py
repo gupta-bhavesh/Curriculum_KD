@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from utils import max_contour
 from metrics import dice_coef, IOU, recall, precision, F1
-
+import torch.nn.functional as F
 def visualizing_results(model, dataloaders, num_images=6):
     was_training = model.training
     model.eval()
@@ -31,8 +31,8 @@ def visualizing_results(model, dataloaders, num_images=6):
                 axes[j, 1].imshow(pred, cmap='gray')
                 pred[pred>0.5] = 255
                 pred[pred<=0.5] = 0
-                post_process = max_contour(pred)
-                axes[j, 2].imshow(post_process, cmap='gray')
+                # post_process = max_contour(pred)
+                axes[j, 2].imshow(pred, cmap='gray')
                 axes[j, 3].imshow(label, cmap='gray')
                 cols = ['Input', 'Prediction', 'Post-Process', 'Ground Truth']
 
@@ -67,7 +67,7 @@ def testing(model, dataloaders):
                 label = labels.cpu().data[j].squeeze()
                 label = label.squeeze().cpu().numpy()
                 pred = outputs.cpu().data[j].squeeze()
-                pred = nn.Softmax()(pred)[1]
+                pred = F.softmax(pred, dim=0)[1]
                 pred = pred.squeeze().cpu().numpy()
                 pred[pred>0.5] = 1
                 pred[pred<=0.5] = 0
@@ -76,7 +76,12 @@ def testing(model, dataloaders):
                 iou_arr.append(IOU(label, post_process/255))
                 precision_arr.append(precision(label, post_process/255))
                 recall_arr.append(recall(label, post_process/255))
-   
+                
+                # dice_arr.append(dice_coef(label, pred))
+                # iou_arr.append(IOU(label, pred))
+                # precision_arr.append(precision(label, pred))
+                # recall_arr.append(recall(label, pred))
+      
         print("-"*10 + "Avg Dice"+ "-"*10)
         print(np.mean(dice_arr))
 
@@ -93,4 +98,4 @@ def testing(model, dataloaders):
         print(F1(np.mean(precision_arr), np.mean(recall_arr)))
 
         model.train(mode=was_training)
-    return
+    return np.mean(dice_arr), np.mean(iou_arr), np.mean(precision_arr), np.mean(recall_arr), F1(np.mean(precision_arr), np.mean(recall_arr))

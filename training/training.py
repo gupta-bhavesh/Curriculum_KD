@@ -53,4 +53,4 @@ def training(model, dataloaders, loss_func, optimizer, scheduler, num_epochs=20)
     print('Best val Loss: {:4f}'.format(best_loss))
 
     model.load_state_dict(best_model_wts)
-    return model
+    return model, all_losses
