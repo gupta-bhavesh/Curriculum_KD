@@ -2,8 +2,7 @@ import torch
 from torch import nn
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import max_contour
-from metrics import dice_coef, IOU, recall, precision, F1
+from metrics import dice_coef, IOU, recall, precision, F1, max_contour, dist_acc, angle_acc, inline_BB, pred_needle_img
 import torch.nn.functional as F
 
 def visualizing_results(model, dataloaders, num_images=6):
