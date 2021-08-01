@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from utils import max_contour
 from metrics import dice_coef, IOU, recall, precision, F1
 import torch.nn.functional as F
+
 def visualizing_results(model, dataloaders, num_images=6):
     was_training = model.training
     model.eval()
