@@ -7,7 +7,6 @@ import torch
 from torch.utils.data import DataLoader
 from torch import nn
 from torch.optim import lr_scheduler, Adam
-from utils import seed_everything
 from dataset import LoadImageDataset
 import train.training as normal_training
 from models.unet import UNet
