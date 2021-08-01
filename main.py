@@ -9,7 +9,7 @@ from torch import nn
 from torch.optim import lr_scheduler, Adam
 from utils import seed_everything
 from dataset import LoadImageDataset
-from train.training import training as normal_training
+import train.training as normal_training
 from models.unet import UNet
 from models.linknet import LinkNet
 from models.deeplab import DeepLabV3
@@ -24,6 +24,7 @@ def main():
     parser.add_argument('--batch_size', default=16, type=int,help='mini-batch size')
     parser.add_argument('--epochs', default=100, type=int, help='number of total epochs to run')
     parser.add_argument('--model_name', default='CKD', help="options:[LinkNet, UNet, CKD, KD, DeepLab]")
+    parser.add_argument('--model_path', default='trained_model2/ce_cda_version3.100.pth', help="path where model is to be saved")
     parser.add_argument('--teacher_path', default='trained_model/unet.pth', help="path to pretrained teacher model")
     parser.add_argument('--weights_to', default="ce", help="options:[ce, kld, both]")
     parser.add_argument('--temp', default=4, type=float,help='temperature')
@@ -32,9 +33,7 @@ def main():
 
     args = parser.parse_args()
 
-    STUDENT_MODEL_PATH = "trained_model2/ce_cda_version3.100.pth"  #   Main Model which is to be trained or tested...
-
-    with open(args.data+"_data.npy", 'rb') as f:
+    with open(args.data+"/data.npy", 'rb') as f:
         train_paths = np.load(f)
         val_paths = np.load(f)
         f.close()
@@ -63,7 +62,7 @@ def main():
         loss_func = nn.CrossEntropyLoss()
         training = normal_training
 
-    elif args.model_name in ['Curriculum KD', 'KD']:
+    elif args.model_name in ['CKD', 'KD']:
         teacher_model = UNet(2)
         student_model = UNet(2)
 
@@ -81,9 +80,9 @@ def main():
         student_model, losses = training(student_model, dataloaders, loss_func, optimizer_ft, exp_lr_scheduler, num_epochs=args.epochs)
     else:
         student_model, losses = training(teacher_model, student_model, dataloaders, loss_func, optimizer_ft, exp_lr_scheduler, num_epochs=args.epochs)
-    torch.save(student_model.state_dict(), STUDENT_MODEL_PATH)
+    torch.save(student_model.state_dict(), args.model_path)
 
-    loss_file = open(STUDENT_MODEL_PATH[:-4]+".json", "w")
+    loss_file = open(args.model_path[:-4]+".json", "w")
     json.dump(losses, loss_file)
     loss_file.close()
 

@@ -5,7 +5,8 @@ from torch.utils.data import DataLoader
 from models.unet import UNet
 from models.linknet import LinkNet
 from models.deeplab import DeepLabV3
-from testing import testing
+from needle.testing import testing as needle_testing
+from bus.testing import testing as bus_testing
 import argparse
 
 def main():
@@ -35,7 +36,10 @@ def main():
     seg_model = seg_model.cuda()
     seg_model.load_state_dict(torch.load(args.model_path))
 
-    dice, iou, precision, recall, F1 = testing(seg_model, dataloaders)
+    if(args.data=="needle"):
+        dice, iou, precision, recall, F1 = needle_testing(seg_model, dataloaders)
+    elif(args.data=="bus"):
+        dice, iou, precision, recall, F1 = bus_testing(seg_model, dataloaders)
 
 if __name__ == '__main__':
     torch.cuda.set_device(1)

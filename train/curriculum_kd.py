@@ -10,10 +10,11 @@ class CurricullumKD_Loss:
         self.alpha = alpha
         self.temp = temp
 
-        self.cda_temp = torch.Tensor([[[temp + (0.923)/100]],[[temp + (0.077)/100]]]).cuda()
+        # self.cda_temp = torch.Tensor([[[temp + (0.923)/100]],[[temp + (0.077)/100]]]).cuda()
         self.ce = nn.CrossEntropyLoss(reduction='none')
         self.kl = nn.KLDivLoss(reduction='none')
-        print("CurricullumKD_Loss", weights_to, alpha, self.cda_temp, self.temp)
+        print("CurricullumKD_Loss", weights_to, alpha, self.temp)
+        # print("CurricullumKD_Loss", weights_to, alpha, self.cda_temp, self.temp)
         if self.weights_to == "kd":
             self.value = self.kd
         if self.weights_to == "curricullum":
@@ -37,10 +38,14 @@ class CurricullumKD_Loss:
 
     def kld_loss(self, teacher_out, outputs):
         
-        teacher_out_temp = F.softmax(teacher_out / self.cda_temp, dim=1)
-        outputs_temp = F.log_softmax(outputs/self.cda_temp, dim=1)
+        # teacher_out_temp = F.softmax(teacher_out / self.cda_temp, dim=1)
+        # outputs_temp = F.log_softmax(outputs/self.cda_temp, dim=1)
+        # kl = self.kl(outputs_temp, teacher_out_temp)*self.cda_temp[0][0][0]*self.cda_temp[0][0][0]
 
-        kl = self.kl(outputs_temp, teacher_out_temp)*self.cda_temp[0][0][0]*self.cda_temp[0][0][0]
+        teacher_out_temp = F.softmax(teacher_out / self.temp, dim=1)
+        outputs_temp = F.log_softmax(outputs/self.temp, dim=1)
+        kl = self.kl(outputs_temp, teacher_out_temp)*self.temp*self.temp
+
         kl = torch.mean(kl, 1)
         return kl
 
